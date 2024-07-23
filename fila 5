@@ -1,0 +1,74 @@
+from flask import Flask, request, jsonify  
+import sqlalchemy as sa  
+import matplotlib.pyplot as plt  
+import io  
+import base64  
+from transformers import T5ForConditionalGeneration, T5Tokenizer  
+import pandas as pd  
+
+app = Flask(__name__)  
+
+# Conectar con TiDB  
+DATABASE_URI = "mysql+pymysql://username:password@host:port/database"  
+engine = sa.create_engine(DATABASE_URI)  
+
+# Cargar el modelo T5  
+tokenizer = T5Tokenizer.from_pretrained("Salesforce/codet5-base")  
+model = T5ForConditionalGeneration.from_pretrained("Salesforce/codet5-base")  
+
+def sql_query_from_nlp(query):  
+    # Convertir consultas naturales a SQL  
+    input_ids = tokenizer.encode(query, return_tensors='pt')  
+    outputs = model.generate(input_ids)  
+    sql_query = tokenizer.decode(outputs[0], skip_special_tokens=True)  
+    return sql_query  
+
+def execute_query(query):  
+    with engine.connect() as connection:  
+        result = connection.execute(sa.text(query))  
+        return result.fetchall()  
+
+def plot_data(data, title):  
+    # Crear un gráfico de barras  
+    df = pd.DataFrame(data, columns=['Label', 'Value'])  
+    plt.bar(df['Label'], df['Value'])  
+    plt.title(title)  
+    plt.xlabel('Categorías')  
+    plt.ylabel('Valores')  
+    plt.xticks(rotation=45)  
+    
+    # Convertir gráfico a imagen en base64  
+    buf = io.BytesIO()  
+    plt.savefig(buf, format='png')  
+    buf.seek(0)  
+    image_base64 = base64.b64encode(buf.read()).decode('utf-8')  
+    plt.close()  
+    
+    return image_base64  
+
+@app.route('/query', methods=['POST'])  
+def query():  
+    natural_query = request.json.get('query')  
+    try:  
+        # Convertir la consulta natural a SQL  
+        sql_query = sql_query_from_nlp(natural_query)  
+        print(f"Consulta SQL generada: {sql_query}")  
+
+        # Ejecutar la consulta  
+        results = execute_query(sql_query)  
+        if not results:  
+            return jsonify({"message": "No se encontraron resultados."})  
+        
+        # Visualizar resultados  
+        image = plot_data(results, "Resultados de la Consulta")  
+        return jsonify({  
+            "query": sql_query,  
+            "results": results,  
+            "chart": image  
+        })  
+
+    except Exception as e:  
+        return jsonify({"error": str(e)})  
+
+if __name__ == '__main__':  
+    app.run(debug=True)
