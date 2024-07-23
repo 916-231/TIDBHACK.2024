@@ -1,0 +1,25 @@
+(comando de bibliotecas)pip install flask sqlalchemy pymysql transformers matplotlib
+Descripción del Programa
+Configuración de la Base de Datos: El programa se conecta a una base de datos TiDB utilizando SQLAlchemy. Asegúrate de reemplazar username, password, host, port, y database con tus credenciales específicas.
+
+Modelo T5: Se utiliza el modelo T5 para convertir consultas en lenguaje natural en SQL.
+
+Funciones Principales:
+
+sql_query_from_nlp: Convierte consultas en lenguaje natural a SQL.
+execute_query: Ejecuta la consulta SQL en la base de datos y obtiene los resultados.
+plot_data: Crea un gráfico de barras con los resultados de la consulta y lo convierte a formato base64 para ser devuelto en formato JSON.
+Interfaz Flask:
+
+Se define un único endpoint /query que acepta solicitudes POST con un cuerpo JSON que contiene la consulta en lenguaje natural.
+Devuelve en respuesta el SQL generado, los resultados, y una imagen del gráfico en base64.
+Ejemplo de Uso
+Para probar este programa, puedes usar una herramienta como Postman o curl. Aquí hay un ejemplo de cómo enviar una consulta en lenguaje natural:  
+Posibles Mejoras
+Mejorar el modelo T5: Entrenar el modelo con un conjunto de datos específico para obtener resultados más precisos en la conversión de lenguaje natural a SQL.
+
+Interfaz de Usuario: Implementar una interfaz gráfica utilizando herramientas como React o Vue.js para mejorar la experiencia del usuario.
+
+Seguridad: Agregar autenticación y autorización para el acceso a la API.
+
+Soporte de Charting Más Completo: Ampliar el programa para incluir diferentes tipos de gráficos (líneas, dispersión, etc.) basados en las especificaciones del usuario.
