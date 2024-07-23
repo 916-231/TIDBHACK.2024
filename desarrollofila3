@@ -1,0 +1,19 @@
+Descripción del Programa
+Búsqueda en Wikipedia: Usamos requests para hacer una búsqueda en Wikipedia y BeautifulSoup para analizar el HTML y extraer el primer resultado relevante.
+
+Consulta al LLM: La función query_llm utiliza la API de OpenAI para enviar la consulta del usuario y recibir una respuesta generada por el modelo de lenguaje.
+
+Mejora de Respuesta: La función improved_response combina las respuestas del LLM y de Wikipedia. Si se encuentra información relevante en Wikipedia, la incorpora en la respuesta final.
+
+Interfaz de Usuario: La función main maneja la interacción con el usuario, permitiéndole ingresar consultas y mostrar la respuesta mejorada.
+
+Requisitos
+Para ejecutar este código, necesitarás:
+
+Una clave API de OpenAI para acceder a su modelo.
+Las bibliotecas requests y beautifulsoup4 instaladas. Puedes instalarlas usando pip:
+pip install requests beautifulsoup4  
+  Cómo Usar el Programa
+Ejecuta el script.
+Ingresa una pregunta en la consola.
+Recibirás una respuesta mejorada que incluye información del LLM junto con un enlace a Wikipedia.
