@@ -1,0 +1,55 @@
+import openai  
+import requests  
+from bs4 import BeautifulSoup  
+
+# Configuración de OpenAI con tu clave API  
+openai.api_key = 'tu_clave_api'  
+
+def search_wikipedia(query):  
+    search_url = f"https://es.wikipedia.org/w/index.php?search={query.replace(' ', '+')}"  
+    response = requests.get(search_url)  
+    soup = BeautifulSoup(response.text, 'html.parser')  
+
+    # Obtener el primer resultado  
+    first_result = soup.find('div', class_='mw-search-result-heading')  
+    if first_result:  
+        page_title = first_result.a['title']  
+        page_link = "https://es.wikipedia.org" + first_result.a['href']  
+        return {  
+            'title': page_title,  
+            'link': page_link  
+        }  
+    return None  
+
+def query_llm(prompt):  
+    response = openai.ChatCompletion.create(  
+        model="gpt-3.5-turbo",  
+        messages=[{"role": "user", "content": prompt}]  
+    )  
+    return response['choices'][0]['message']['content']  
+
+def improved_response(user_query):  
+    # Obtener la respuesta del LLM  
+    llm_response = query_llm(user_query)  
+    
+    # Buscar información adicional en Wikipedia  
+    wiki_info = search_wikipedia(user_query)  
+
+    if wiki_info:  
+        wiki_title = wiki_info['title']  
+        wiki_link = wiki_info['link']  
+        improved_output = f"{llm_response}\n\nPara más información, consulta: {wiki_title} ({wiki_link})"  
+    else:  
+        improved_output = llm_response  
+    
+    return improved_output  
+
+def main():  
+    print("Bienvenido a la aplicación de mejora de respuestas de LLM.")  
+    user_query = input("Por favor, ingresa tu pregunta: ")  
+    response = improved_response(user_query)  
+    print("\nRespuesta mejorada:")  
+    print(response)  
+
+if __name__ == "__main__":  
+    main()
