@@ -1,0 +1,57 @@
+from flask import Flask, request, jsonify  
+import pandas as pd  
+from nltk.sentiment import SentimentIntensityAnalyzer  
+
+app = Flask(__name__)  
+sia = SentimentIntensityAnalyzer()  
+
+# Simulación de un almacenamiento de mensajes  
+messages = []  
+
+@app.route('/send', methods=['POST'])  
+def send_message():  
+    data = request.json  
+    message = data.get('message')  
+    
+    # Procesar el mensaje para análisis de sentimiento  
+    sentiment_score = sia.polarity_scores(message)  
+    sentiment = categorize_sentiment(sentiment_score)  
+
+    # Guardar el mensaje y su análisis  
+    messages.append({  
+        'message': message,  
+        'sentiment_score': sentiment_score,  
+        'sentiment': sentiment  
+    })  
+
+    # Responder en tiempo real  
+    response = generate_response(sentiment)  
+    
+    return jsonify({  
+        'original_message': message,  
+        'sentiment': sentiment,  
+        'response': response  
+    })  
+
+def categorize_sentiment(score):  
+    if score['compound'] >= 0.05:  
+        return 'Positive'  
+    elif score['compound'] <= -0.05:  
+        return 'Negative'  
+    else:  
+        return 'Neutral'  
+
+def generate_response(sentiment):  
+    if sentiment == 'Positive':  
+        return "I'm glad to hear that!"  
+    elif sentiment == 'Negative':  
+        return "I'm sorry to hear that. How can I help?"  
+    else:  
+        return "Thank you for sharing your thoughts!"  
+
+@app.route('/messages', methods=['GET'])  
+def get_messages():  
+    return jsonify(messages)  
+
+if __name__ == '__main__':  
+    app.run(debug=True)
