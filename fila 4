@@ -1,0 +1,46 @@
+import numpy as np  
+from sklearn.metrics.pairwise import cosine_similarity  
+from sentence_transformers import SentenceTransformer  
+
+# Inicializar el modelo de Sentence-BERT  
+model = SentenceTransformer('paraphrase-MiniLM-L6-v2')  
+
+# Conjunto de datos de ejemplo  
+documents = [  
+    "El clima hoy es soleado con algunas nubes.",  
+    "La tecnología avanza a pasos agigantados.",  
+    "El fútbol es el deporte más popular en el mundo.",  
+    "Hoy es un día ideal para una caminata al aire libre.",  
+    "El baloncesto es un deporte que se juega en equipo.",  
+    "La inteligencia artificial está transformando diversas industrias.",  
+    "Es un buen día para aprender algo nuevo."  
+]  
+
+# Generar embeddings para cada documento  
+document_embeddings = model.encode(documents)  
+
+def find_similar_documents(query, top_n=3):  
+    # Generar embedding para la consulta  
+    query_embedding = model.encode([query])  
+    
+    # Calcular similitud coseno entre la consulta y documentos  
+    similarities = cosine_similarity(query_embedding, document_embeddings)  
+    
+    # Obtener los indices de los documentos más similares  
+    similar_indices = similarities[0].argsort()[-top_n:][::-1]  
+    
+    # Devolver los documentos más similares  
+    return [(documents[i], similarities[0][i]) for i in similar_indices]  
+
+def main():  
+    print("Bienvenido a la aplicación de búsqueda de documentos similares.")  
+    query = input("Por favor, ingresa tu consulta: ")  
+    
+    similar_docs = find_similar_documents(query)  
+    
+    print("\nDocumentos similares encontrados:")  
+    for doc, sim in similar_docs:  
+        print(f" - {doc} (Similitud: {sim:.4f})")  
+
+if __name__ == "__main__":  
+    main()
