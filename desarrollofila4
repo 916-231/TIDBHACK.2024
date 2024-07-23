@@ -1,0 +1,23 @@
+(bibliotecas necesarias.)pip install sentence-transformers scikit-learn numpy
+  Descripción del Programa
+Modelo Sentence-BERT: Utilizamos la biblioteca sentence-transformers para cargar un modelo que convierte texto en vectores de alta dimensión. En este caso, usamos el modelo paraphrase-MiniLM-L6-v2, que está optimizado para comparaciones de similitud de texto.
+
+Conjunto de Documentos: Creamos un conjunto de documentos de ejemplo. Este podría ser reemplazado por cualquier conjunto de datos que desees.
+
+Generación de Embeddings: Se generan embeddings para todos los documentos en el conjunto al inicializar el modelo.
+
+Búsqueda de Documentos Similares:
+
+Se calcula el embedding para la consulta del usuario.
+Se usa la distancia coseno para calcular la similitud entre la consulta y cada documento.
+Se devuelven los documentos más similares a la consulta.
+Interfaz de Usuario: La función main gestiona la entrada del usuario y muestra los documentos similares y su puntuación de similitud.
+
+Cómo Usar el Programa
+Ejecuta el script en tu entorno de Python.
+Ingresa una consulta en la consola.
+Recibirás una lista de documentos que son semánticamente similares a tu consulta, junto con una puntuación que indica la similitud.
+  Posibles Mejoras
+Implementar una interfaz gráfica de usuario (GUI).
+Levar un conjunto de datos más grande y diversificado.
+Agregar un preprocesamiento adicional para limpiar las frases de entrada.
