@@ -1,0 +1,42 @@
+from flask import Flask, request, jsonify  
+import pandas as pd  
+from sklearn.feature_extraction.text import TfidfVectorizer  
+from sklearn.metrics.pairwise import cosine_similarity  
+
+app = Flask(__name__)  
+
+# Simulación de un conjunto de datos de productos  
+products = pd.DataFrame({  
+    'id': [1, 2, 3, 4],  
+    'name': ['Laptop', 'Tablet', 'Smartphone', 'Headphones'],  
+    'description': [  
+        'A laptop with high performance for gaming.',  
+        'A lightweight tablet for reading and browsing.',  
+        'An Android smartphone with a great camera.',  
+        'Noise-cancelling headphones with high audio quality.'  
+    ]  
+})  
+
+# Vectorizar las descripciones de los productos  
+vectorizer = TfidfVectorizer()  
+tfidf_matrix = vectorizer.fit_transform(products['description'])  
+
+@app.route('/predict', methods=['POST'])  
+def predict():  
+    data = request.json  
+    user_input = data.get('query', '')  
+    
+    # Vectorizar la entrada del usuario  
+    user_vector = vectorizer.transform([user_input])  
+    
+    # Calcular similitudes  
+    cosine_similarities = cosine_similarity(user_vector, tfidf_matrix).flatten()  
+    related_products_indices = cosine_similarities.argsort()[-3:][::-1]  
+    
+    # Obtener productos recomendados  
+    recommended_products = products.iloc[related_products_indices].to_dict(orient='records')  
+    
+    return jsonify(recommended_products)  
+
+if __name__ == '__main__':  
+    app.run(debug=True)
